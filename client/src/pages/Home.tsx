@@ -1,6 +1,6 @@
 /**
  * Design: “Morning Desk” — warm paper surfaces, sage-green task signals, and an asymmetric desk layout.
- * The page keeps controls compact so the scrollable task list receives the maximum available working space.
+ * The page keeps controls compact, groups every task by its chosen calendar day, and leaves generous room for the list.
  */
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
@@ -23,12 +23,22 @@ type Todo = {
   text: string;
   completed: boolean;
   createdAt: number;
+  dateKey: string;
 };
 
+const getDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const todayKey = getDateKey(new Date());
+
 const starterTodos: Todo[] = [
-  { id: "focus", text: "Block out 30 minutes for deep work", completed: false, createdAt: 1 },
-  { id: "reply", text: "Reply to the day’s most important email", completed: false, createdAt: 2 },
-  { id: "review", text: "Review notes for the next project step", completed: true, createdAt: 3 },
+  { id: "focus", text: "Block out 30 minutes for deep work", completed: false, createdAt: 1, dateKey: todayKey },
+  { id: "reply", text: "Reply to the day’s most important email", completed: false, createdAt: 2, dateKey: todayKey },
+  { id: "review", text: "Review notes for the next project step", completed: true, createdAt: 3, dateKey: todayKey },
 ];
 
 const storageKey = "morning-desk-todos";
@@ -53,7 +63,13 @@ export default function Home() {
       if (stored) {
         const parsed = JSON.parse(stored) as Todo[];
         if (Array.isArray(parsed)) {
-          setTodos(parsed.map((todo) => ({ ...todo, text: legacyStarterCopy[todo.id] ?? todo.text })));
+          setTodos(
+            parsed.map((todo) => ({
+              ...todo,
+              text: legacyStarterCopy[todo.id] ?? todo.text,
+              dateKey: todo.dateKey ?? todayKey,
+            })),
+          );
         }
       }
     } catch {
@@ -82,11 +98,23 @@ export default function Home() {
     [selectedDate],
   );
 
-  const completedCount = todos.filter((todo) => todo.completed).length;
-  const activeCount = todos.length - completedCount;
-  const progress = todos.length ? Math.round((completedCount / todos.length) * 100) : 0;
+  const deskMonth = useMemo(
+    () => new Intl.DateTimeFormat("en-US", { month: "short" }).format(selectedDate).toUpperCase(),
+    [selectedDate],
+  );
 
-  const visibleTodos = todos.filter((todo) => {
+  const deskWeekday = useMemo(
+    () => new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(selectedDate).toUpperCase(),
+    [selectedDate],
+  );
+
+  const selectedDateKey = useMemo(() => getDateKey(selectedDate), [selectedDate]);
+  const dateTodos = todos.filter((todo) => todo.dateKey === selectedDateKey);
+  const completedCount = dateTodos.filter((todo) => todo.completed).length;
+  const activeCount = dateTodos.length - completedCount;
+  const progress = dateTodos.length ? Math.round((completedCount / dateTodos.length) * 100) : 0;
+
+  const visibleTodos = dateTodos.filter((todo) => {
     if (filter === "active") return !todo.completed;
     if (filter === "completed") return todo.completed;
     return true;
@@ -97,7 +125,7 @@ export default function Home() {
     const text = newTask.trim();
     if (!text) return;
     setTodos((current) => [
-      { id: crypto.randomUUID(), text, completed: false, createdAt: Date.now() },
+      { id: crypto.randomUUID(), text, completed: false, createdAt: Date.now(), dateKey: selectedDateKey },
       ...current,
     ]);
     setNewTask("");
@@ -115,7 +143,7 @@ export default function Home() {
   };
 
   const clearCompleted = () => {
-    setTodos((current) => current.filter((todo) => !todo.completed));
+    setTodos((current) => current.filter((todo) => todo.dateKey !== selectedDateKey || !todo.completed));
   };
 
   return (
@@ -139,26 +167,33 @@ export default function Home() {
                   className="h-11 w-11 rounded-2xl bg-[#f7f4ec] p-2 shadow-[0_3px_10px_rgba(69,83,65,0.12)]"
                 />
                 <div>
-                  <span className="block font-serif text-[1.4rem] tracking-[-0.03em]">Today List</span>
-                  <span className="mt-0.5 block text-[9px] font-semibold tracking-[0.15em] text-[#728072]">QUIET TASK DESK</span>
+                  <span className="block font-serif text-[1.4rem] tracking-[-0.03em]">今日清單</span>
+                  <span className="mt-0.5 block text-[9px] font-semibold tracking-[0.15em] text-[#728072]">TODAY LIST</span>
                 </div>
               </div>
               <span className="rounded-full border border-[#a9b8a7] bg-[#f7f7ee]/70 px-3 py-1 text-[11px] font-semibold tracking-[0.11em] text-[#667767] lg:mt-7 lg:inline-block">
-                PERSONAL DESK
+                DAILY DESK
               </span>
             </div>
 
-            <div className="relative z-10 mt-10 max-w-[270px] sm:mt-12 lg:mt-auto">
-              <p className="text-[11px] font-semibold tracking-[0.16em] text-[#6f8c7a]">TODAY’S FOCUS</p>
-              <h1 className="mt-3 font-serif text-4xl leading-[1.08] tracking-[-0.045em] text-[#33463a] sm:text-5xl lg:text-[3.2rem]">
-                Leave room<br />for one thing.
-              </h1>
-              <p className="mt-5 max-w-[250px] text-sm leading-6 text-[#5e6d60]">
-                Let the list hold the noise, so your attention can stay with what matters.
-              </p>
+            <div className="relative z-10 mt-10 lg:mt-12">
+              <div className="absolute inset-x-3 top-2 h-full rounded-2xl border border-[#cad2c5] bg-[#dce3d8]" />
+              <div className="relative overflow-hidden rounded-2xl border border-[#c5cdbc] bg-[#f8f7ef]/90 px-5 py-5 shadow-[0_8px_18px_rgba(89,100,81,0.08)]">
+                <div className="absolute right-0 top-0 h-9 w-9 rounded-bl-[1.4rem] border-b border-l border-[#c5cdbc] bg-[#eef2ea]" />
+                <span className="block text-[9px] font-semibold tracking-[0.15em] text-[#728072]">DATE NOTE</span>
+                <div className="mt-3 flex items-end justify-between">
+                  <span className="font-serif text-6xl leading-none tracking-[-0.08em] text-[#33463a]">{selectedDate.getDate()}</span>
+                  <div className="pb-1 text-right">
+                    <span className="block text-xs font-semibold tracking-[0.13em] text-[#6f8c7a]">{deskMonth}</span>
+                    <span className="mt-1 block text-[9px] tracking-[0.1em] text-[#7d887c]">{deskWeekday}</span>
+                  </div>
+                </div>
+                <div className="mt-4 h-px bg-[#d7ddd0]" />
+                <span className="mt-3 block text-[10px] tracking-[0.08em] text-[#718070]">YOUR TASKS, ONE DAY AT A TIME</span>
+              </div>
             </div>
 
-            <div className="relative z-10 mt-8 grid grid-cols-2 gap-3 border-t border-[#bfc8ba] pt-6 lg:mt-9">
+            <div className="relative z-10 mt-8 grid grid-cols-2 gap-3 border-t border-[#bfc8ba] pt-6 lg:mt-auto">
               <div>
                 <span className="block font-serif text-3xl tracking-[-0.04em] text-[#33463a]">{activeCount}</span>
                 <span className="mt-1 block text-[11px] tracking-[0.1em] text-[#718070]">TO DO</span>
@@ -214,17 +249,17 @@ export default function Home() {
             </header>
 
             <form onSubmit={addTodo} className="relative mt-5 flex gap-3 before:absolute before:bottom-4 before:left-0 before:h-5 before:w-1 before:rounded-r-full before:bg-[#6f8c7a]">
-              <label className="sr-only" htmlFor="new-task">Add a task</label>
+              <label className="sr-only" htmlFor="new-task">Add a task for the selected date</label>
               <input
                 id="new-task"
                 value={newTask}
                 onChange={(event) => setNewTask(event.target.value)}
-                placeholder="Write down the next important thing…"
+                placeholder={`Add a task for ${shortDateLabel}…`}
                 className="min-w-0 flex-1 rounded-2xl border border-[#d7d9ce] bg-[#fffdf9] px-5 py-3.5 pl-6 text-[15px] text-[#26342c] outline-none transition placeholder:text-[#9da69c] focus:border-[#6f8c7a] focus:ring-4 focus:ring-[#6f8c7a]/15"
               />
               <button
                 type="submit"
-                aria-label="Add task"
+                aria-label="Add task to selected date"
                 className="group inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl bg-[#6f8c7a] text-white shadow-[0_8px_20px_rgba(111,140,122,0.28)] transition duration-150 hover:bg-[#5d7968] active:scale-[0.97] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#6f8c7a]/40"
               >
                 <CirclePlus className="h-5 w-5 transition-transform duration-200 group-hover:rotate-90" strokeWidth={1.8} />
@@ -268,7 +303,13 @@ export default function Home() {
               )}
             </div>
 
-            <div className="mt-3 min-h-[340px] flex-1 overflow-y-auto pr-1 sm:mt-4 sm:min-h-[390px]" aria-label="Task list">
+            <div className="mt-3 min-h-[340px] flex-1 overflow-y-auto pr-1 sm:mt-4 sm:min-h-[390px]" aria-label={`Task list for ${shortDateLabel}`}>
+              <div className="flex items-center gap-3 border-b border-dashed border-[#d8d6cc] py-3">
+                <span className="h-2 w-2 rounded-full bg-[#6f8c7a]" />
+                <span className="text-[10px] font-semibold tracking-[0.13em] text-[#758274]">TASKS FOR {shortDateLabel.toUpperCase()}</span>
+                <span className="h-px flex-1 bg-[#e7e4da]" />
+                <span className="text-[11px] text-[#889087]">{dateTodos.length}</span>
+              </div>
               {visibleTodos.length > 0 ? (
                 <ul className="divide-y divide-[#e5e3da]" aria-live="polite">
                   {visibleTodos.map((todo, index) => (
@@ -309,23 +350,23 @@ export default function Home() {
                   ))}
                 </ul>
               ) : (
-                <div className="flex h-full min-h-[300px] flex-col items-center justify-center px-6 text-center">
+                <div className="flex min-h-[300px] flex-col items-center justify-center px-6 text-center">
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef2ea] text-[#6f8c7a]">
                     {filter === "completed" ? <Sparkles className="h-6 w-6" /> : <ListChecks className="h-6 w-6" />}
                   </div>
                   <h3 className="mt-5 font-serif text-2xl tracking-[-0.03em] text-[#33463a]">
-                    {filter === "completed" ? "Nothing completed yet" : "A little room to begin"}
+                    {filter === "completed" ? "Nothing completed yet" : "A clear page for this day"}
                   </h3>
                   <p className="mt-2 max-w-xs text-sm leading-6 text-[#7d857b]">
-                    {filter === "completed" ? "Finish a task and it will settle here quietly." : "Write down one small task above to give the day a clear start."}
+                    {filter === "completed" ? "Finish a task and it will settle here quietly." : `Add the first task for ${shortDateLabel}.`}
                   </p>
                 </div>
               )}
             </div>
 
             <footer className="mt-3 flex items-center justify-between border-t border-[#e1ded4] pt-4 text-xs text-[#7d857b]">
-              <span className="inline-flex items-center gap-1.5"><ChevronRight className="h-3.5 w-3.5 text-[#6f8c7a]" />Tasks stay saved on this device</span>
-              <span className="hidden items-center gap-1 text-[#6f8c7a] sm:inline-flex">One thing at a time <ArrowUpRight className="h-3.5 w-3.5" /></span>
+              <span className="inline-flex items-center gap-1.5"><ChevronRight className="h-3.5 w-3.5 text-[#6f8c7a]" />Tasks are grouped by their selected date</span>
+              <span className="hidden items-center gap-1 text-[#6f8c7a] sm:inline-flex">One day at a time <ArrowUpRight className="h-3.5 w-3.5" /></span>
             </footer>
           </section>
         </div>
