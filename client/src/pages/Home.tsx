@@ -116,27 +116,17 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <img
                   src="/manus-storage/todo-sage-stamp_fbd4fc25.png"
-                  alt="今日清單"
+                  alt="To-Do-List"
                   className="h-11 w-11 rounded-2xl bg-[#f7f4ec] p-2 shadow-sm"
                 />
-                <span className="font-serif text-[1.4rem] tracking-[-0.03em]">今日清單</span>
+                <span className="font-serif text-[1.4rem] tracking-[-0.03em]">To-Do-List</span>
               </div>
               <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold tracking-[0.11em] text-[#e6eee6] lg:mt-9 lg:inline-block">
                 PERSONAL DESK
               </span>
             </div>
 
-            <div className="relative z-10 mt-10 max-w-[290px] sm:mt-12 lg:mt-auto">
-              <p className="text-[11px] font-semibold tracking-[0.16em] text-[#bdd0c0]">TODAY’S FOCUS</p>
-              <h1 className="mt-3 font-serif text-4xl leading-[1.08] tracking-[-0.045em] sm:text-5xl lg:text-[3.5rem]">
-                先留一件事<br />給今天。
-              </h1>
-              <p className="mt-5 max-w-[250px] text-sm leading-6 text-[#d6e0d5]">
-                讓清單替你收好雜訊，為真正重要的事留一段專注。
-              </p>
-            </div>
-
-            <div className="relative z-10 mt-8 grid grid-cols-2 gap-3 border-t border-white/15 pt-6 lg:mt-12">
+            <div className="relative z-10 mt-10 grid grid-cols-2 gap-3 border-t border-white/15 pt-6 lg:mt-auto">
               <div>
                 <span className="block font-serif text-3xl tracking-[-0.04em]">{activeCount}</span>
                 <span className="mt-1 block text-[11px] tracking-[0.1em] text-[#bdd0c0]">仍待完成</span>
