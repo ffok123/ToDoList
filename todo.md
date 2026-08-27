@@ -10,3 +10,7 @@
 - [x] Store a selected due date with each new task, including future dates.
 - [x] Render all tasks in chronological date groups.
 - [x] Validate future-date creation, grouped rendering, and responsive layout.
+- [x] Configure relative build paths for GitHub Pages.
+- [x] Add a GitHub Actions Pages deployment workflow.
+- [x] Document the one-time GitHub Pages repository setting.
+- [x] Verify the production static build.

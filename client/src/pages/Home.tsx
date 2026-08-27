@@ -135,24 +135,21 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#f6f3ec] text-[#26342c]">
-      <div className="min-h-screen bg-[linear-gradient(115deg,rgba(246,243,236,0.94),rgba(246,243,236,0.78)),url('/manus-storage/todo-paper-texture_a7d47a56.jpg')] bg-cover bg-center">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_14%_8%,rgba(228,236,224,0.72),transparent_28rem),linear-gradient(115deg,rgba(246,243,236,0.94),rgba(246,243,236,0.78))]">
         <div className="mx-auto flex min-h-screen max-w-[1480px] flex-col px-5 py-5 sm:px-8 sm:py-8 lg:flex-row lg:gap-7 lg:px-10 lg:py-10">
           <aside className="relative overflow-hidden rounded-[2rem] border border-[#fffdf8] bg-[#e8e7dc] px-6 py-7 text-[#33463a] shadow-[0_24px_70px_rgba(89,80,57,0.15)] sm:px-8 lg:flex lg:w-[370px] lg:shrink-0 lg:flex-col lg:px-9 lg:py-10">
-            <img
-              src="/manus-storage/todo-morning-desk-hero_2439251b.jpg"
-              alt=""
-              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.12] mix-blend-multiply"
-            />
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(150deg,rgba(251,249,242,0.88),rgba(223,229,216,0.79))]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_18%,rgba(214,225,211,0.82),transparent_26rem),linear-gradient(150deg,rgba(251,249,242,0.92),rgba(223,229,216,0.82))]" />
             <div className="pointer-events-none absolute left-0 top-28 h-16 w-1.5 rounded-r-full bg-[#6f8c7a]" />
 
             <div className="relative z-10 flex items-center justify-between lg:block">
               <div className="flex items-center gap-3">
-                <img
-                  src="/manus-storage/todo-sage-stamp_fbd4fc25.png"
-                  alt="To-Do-List"
-                  className="h-11 w-11 rounded-2xl bg-[#f7f4ec] p-2 shadow-[0_3px_10px_rgba(69,83,65,0.12)]"
-                />
+                <div role="img" aria-label="To-Do-List mark" className="relative h-11 w-11 shrink-0 rounded-2xl bg-[#f7f4ec] shadow-[0_3px_10px_rgba(69,83,65,0.12)]">
+                  <span className="absolute left-[10px] top-[11px] h-[18px] w-[16px] rounded-[4px] border border-[#8ba58f] bg-[#d6e2d5] rotate-[-8deg]" />
+                  <span className="absolute left-[15px] top-[15px] h-[18px] w-[16px] rounded-[4px] border border-[#5f7e69] bg-[#89a991]" />
+                  <span className="absolute left-[8px] top-[7px] flex h-[13px] w-[13px] items-center justify-center rounded-full bg-[#6f8c7a] shadow-[0_1px_3px_rgba(53,72,59,0.25)]">
+                    <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
+                  </span>
+                </div>
                 <span className="font-serif text-[1.4rem] tracking-[-0.03em]">To-Do-List</span>
               </div>
               <span className="rounded-full border border-[#adb9a8] bg-[#f8f8ef]/70 px-3 py-1 text-[11px] font-semibold tracking-[0.11em] text-[#687768] lg:mt-9 lg:inline-block">
