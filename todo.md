@@ -14,3 +14,7 @@
 - [x] Add a GitHub Actions Pages deployment workflow.
 - [x] Document the one-time GitHub Pages repository setting.
 - [x] Verify the production static build.
+
+- [ ] Create the public GitHub repository ToDoList.
+- [ ] Push the GitHub Pages-ready project to the repository.
+- [ ] Confirm the GitHub Actions Pages deployment and public link.
